@@ -63,9 +63,13 @@ public class BioItems {
             cost = 1.8f;
         }};
 
+        chromite = new Item("chromite", Color.valueOf("f7f7f7")){{
+            hardness = 2;
+            cost = 1.3f;
+        }};      
         andoriItems.addAll(
                 carbonicTissue, calciticFragment, magnesium, potash,
-                carminite, phosphorus, dustClump, proteicPaste, stemCapsule
+                carminite, phosphorus, dustClump, proteicPaste, stemCapsule, chromite
         );
     }
 }
