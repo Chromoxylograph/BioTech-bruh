@@ -5,7 +5,6 @@ import arc.graphics.gl.Shader;
 import biotech.BioTech;
 import biotech.entities.bullet.LightningLaserBulletType;
 import biotech.world.blocks.power.PowerConduit;
-import biotech.world.blocks.unit.UnitCapUnitCargoLoader;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.bullet.*;
@@ -28,10 +27,7 @@ import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.distribution.BufferedItemBridge;
 import mindustry.world.blocks.distribution.Conveyor;
 import mindustry.world.blocks.distribution.Router;
-import mindustry.world.blocks.environment.Floor;
-import mindustry.world.blocks.environment.OreBlock;
-import mindustry.world.blocks.environment.StaticWall;
-import mindustry.world.blocks.environment.SteamVent;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.heat.HeatProducer;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.liquid.LiquidBridge;
@@ -61,14 +57,14 @@ public class BioBlocks {
 
             //env
             flesh, rottenFlesh, decayedFlesh, scarredFlesh,
-            flint, bone, myostone, flourspar, dolomite, alloyFloor, squareAlloyFloor,
+            flint, bone, myostone, flourspar, dolomite, alloyFloor, squareAlloyFloor, gneiss, marl,
             oreMagnesium, orePhosphorus,
             fleshWall, rottenFleshWall, decayedFleshWall,
-            boneWall, decayedBoneWall, dolomiteWall, flintWall, floursparWall, myostoneWall, alloyWall,
+            boneWall, decayedBoneWall, dolomiteWall, flintWall, floursparWall, myostoneWall, alloyWall, gneissWall, marlWall,
             poreHole,
 
             //props
-            nerveProtrusion, fleshGrowth, undevelopedCyst,
+            nerveProtrusion, fleshAmalgam, fleshBoulder, rottenFleshAmalgam,
 
             //turret
             alive, spike, celluris, dissection, needle,
@@ -144,6 +140,7 @@ public class BioBlocks {
             speed = 74f;
             arrowSpacing = 6f;
             bufferCapacity = 14;
+            underBullets = true;
         }};
         magnesiumConveyor = new Conveyor("magnesium-convayor"){{
             researchCost = with(BioItems.magnesium, 15);
@@ -152,10 +149,12 @@ public class BioBlocks {
             health = 35;
             speed = 0.04f;
             displayedSpeed = 8f;
+            underBullets = true;
         }};
 
         splitter = new Router("splitter"){{
             requirements(Category.distribution, with(BioItems.magnesium, 2));
+            underBullets = true;
             health = 40;
         }};
         //endregion
@@ -244,7 +243,8 @@ public class BioBlocks {
         rottenFlesh = new Floor("rotten-flesh", 4);
         decayedFlesh = new Floor("decayed-flesh", 4);
         scarredFlesh = new Floor("scarred-flesh", 4);
-
+        gneiss = new Floor("gneiss", 4);
+        marl = new Floor("marl", 4);
         boneWall = new StaticWall("bone-wall");
 
         decayedBoneWall = new StaticWall("decayed-bone-wall"){{
@@ -260,12 +260,32 @@ public class BioBlocks {
         alloyWall = new StaticWall("alloy-wall");
         rottenFleshWall = new StaticWall("rotten-flesh-wall");
         decayedFleshWall = new StaticWall("decayed-flesh-wall");
+        gneissWall = new StaticWall("gneiss-wall");
+        marlWall = new StaticWall("marl-wall");
 
         poreHole = new SteamVent("pore-hole"){{
             parent = blendGroup = flesh;
             variants = 3;
             effectSpacing = 100f;
             effectColor = Color.valueOf("a69780");
+        }};
+
+        nerveProtrusion = new TreeBlock("nerve-protrusion");
+        fleshAmalgam = new TreeBlock("flesh-amalgam"){{
+            variants = 3;
+            clipSize = 192f;
+            shadowOffset = -1.1f;
+        }};
+        fleshBoulder = new TallBlock("flesh-boulder"){{
+            variants = 3;
+            clipSize = 192f;
+            shadowOffset = -0.9f;
+            shadowAlpha = 0.6f;
+        }};
+        rottenFleshAmalgam = new TallBlock("rotten-flesh-amalgam"){{
+            variants = 3;
+            clipSize = 192f;
+            shadowOffset = -1.1f;
         }};
 
         oreMagnesium = new OreBlock("ore-magnesium"){{
@@ -690,12 +710,11 @@ public class BioBlocks {
 
         //units
         aircraftManufacturer = new UnitFactory("aircraft-manufacturer"){{
-            // TODO: CHANGE RESEARCH / BUILD COST
-            requirements(Category.units, with(BioItems.magnesium, 120, BioItems.carbonicTissue, 150, BioItems.calciticFragment, 140));
+            requirements(Category.units, with(BioItems.magnesium, 120, BioItems.carbonicTissue, 150, BioItems.calciticFragment, 140, BioItems.potash, 50, BioItems.phosphorus, 32));
             size = 3;
-            plans.add(new UnitPlan(BioUnits.scout, 60 * 28f, with(BioItems.magnesium, 35, BioItems.carbonicTissue, 15)));
-            researchCostMultiplier = 0.5f;
-            consumeLiquid(BioLiquids.hemoFluid, 0.2f);
+            plans.add(new UnitPlan(BioUnits.scout, 60 * 28f, with(BioItems.magnesium, 35, BioItems.potash, 45)));
+            researchCostMultiplier = 0.8f;
+            consumeLiquid(BioLiquids.hemoFluid, 0.3f);
         }};
 
         groundManufacturer = new UnitFactory("ground-manufacturer"){{
@@ -706,7 +725,8 @@ public class BioBlocks {
             consumeLiquid(BioLiquids.hemoFluid, 0.2f);
         }};
 
-        unitDocker = new UnitCapUnitCargoLoader("unit-docker"){{
+        unitDocker = new UnitCargoLoader("unit-docker"){{
+            researchCost = with(BioItems.magnesium, 120, BioItems.calciticFragment, 50);
             unitType = BioUnits.carrier;
 
             polyColor = BioPal.supportGreenLight;
@@ -722,6 +742,7 @@ public class BioBlocks {
         }};
 
         unitDischarger = new UnitCargoUnloadPoint("unit-discharger"){{
+            researchCost = with(BioItems.magnesium, 85, BioItems.calciticFragment, 35);
             requirements(Category.distribution, with(BioItems.magnesium, 34, BioItems.calciticFragment, 15));
             size = 2;
             itemCapacity = 40;
